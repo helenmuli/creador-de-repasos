@@ -15,15 +15,10 @@
       --bg: #F4F7FB;
       --card-bg: #FFFFFF;
       --text: #2D3748;
-      --border: #CBD5E0;
-    }
-
-    * {
-      box-sizing: border-box;
     }
 
     body {
-      font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
       background-color: var(--bg);
       color: var(--text);
       margin: 0;
@@ -47,7 +42,7 @@
     }
 
     header h1 { margin: 0 0 8px 0; font-size: 26px; }
-    header p { margin: 0; opacity: 0.95; font-size: 15px; }
+    header p { margin: 0; opacity: 0.9; font-size: 15px; }
 
     .card {
       background: var(--card-bg);
@@ -59,7 +54,7 @@
 
     .form-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
       gap: 20px;
     }
 
@@ -73,7 +68,7 @@
 
     input, select, button {
       padding: 12px;
-      border: 1px solid var(--border);
+      border: 1px solid #CBD5E0;
       border-radius: 8px;
       font-size: 15px;
       outline: none;
@@ -91,19 +86,10 @@
       text-align: center;
       background: #EDF2F7;
       cursor: pointer;
-      transition: background 0.2s, border-color 0.2s;
+      transition: background 0.2s;
     }
 
-    .file-dropzone:hover { 
-      background: #E2E8F0; 
-      border-color: var(--primary);
-    }
-
-    .file-dropzone.active {
-      background: #EBF8FF;
-      border-color: var(--primary);
-      color: var(--primary-dark);
-    }
+    .file-dropzone:hover { background: #E2E8F0; }
 
     .btn-group {
       display: flex;
@@ -121,23 +107,19 @@
       transition: background 0.2s, transform 0.1s;
       display: inline-flex;
       align-items: center;
-      justify-content: center;
       gap: 8px;
     }
 
     .btn:hover { background-color: var(--primary-dark); transform: translateY(-1px); }
-    .btn:disabled { background-color: #A0AEC0; cursor: not-allowed; transform: none; opacity: 0.7; }
+    .btn:disabled { background-color: #A0AEC0; cursor: not-allowed; transform: none; }
     .btn-secondary { background-color: var(--secondary); }
-    .btn-secondary:hover { background-color: #2C7A7B; }
     .btn-accent { background-color: var(--accent); }
-    .btn-accent:hover { background-color: #2F855A; }
 
     .tabs {
       display: flex;
       gap: 8px;
       border-bottom: 2px solid #E2E8F0;
       margin-bottom: 20px;
-      overflow-x: auto;
     }
 
     .tab-btn {
@@ -149,7 +131,6 @@
       color: #718096;
       cursor: pointer;
       border-radius: 0;
-      white-space: nowrap;
     }
 
     .tab-btn.active {
@@ -168,24 +149,6 @@
       min-height: 200px;
       max-height: 600px;
       overflow-y: auto;
-    }
-
-    .output-box table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 15px;
-    }
-
-    .output-box th, .output-box td {
-      border: 1px solid #CBD5E0;
-      padding: 8px 12px;
-      text-align: left;
-      font-size: 14px;
-    }
-
-    .output-box th {
-      background-color: #EDF2F7;
-      color: var(--primary-dark);
     }
 
     .action-bar {
@@ -211,9 +174,22 @@
       padding: 20px;
       font-weight: 600;
       color: var(--primary);
-      background: #EBF8FF;
-      border-radius: 8px;
-      margin-top: 15px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+
+    th, td {
+      border: 1px solid #CBD5E0;
+      padding: 8px 12px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #EDF2F7;
     }
   </style>
 </head>
@@ -229,9 +205,20 @@
     <div class="card">
       <div class="form-grid">
         <div class="form-group">
-          <label for="apiKey">🔑 Clave API de Gemini (Gratuita):</label>
+          <label for="apiKey">🔑 Clave API de Gemini:</label>
           <input type="password" id="apiKey" placeholder="Pega tu API Key de Google AI Studio...">
-          <small><a href="https://aistudio.google.com/app/apikey" target="_blank" style="color: var(--primary);">Obtener API Key gratuita en Google AI Studio</a></small>
+          <small><a href="https://aistudio.google.com/app/apikey" target="_blank" style="color: var(--primary);">Obtener API Key gratuita</a></small>
+        </div>
+
+        <div class="form-group">
+          <label for="modelSelect">🤖 Modelo de IA:</label>
+          <select id="modelSelect">
+            <option value="gemini-2.5-flash" selected>gemini-2.5-flash (Recomendado)</option>
+            <option value="gemini-2.0-flash">gemini-2.0-flash</option>
+            <option value="gemini-1.5-flash-latest">gemini-1.5-flash-latest</option>
+            <option value="gemini-1.5-flash">gemini-1.5-flash</option>
+            <option value="gemini-1.5-pro">gemini-1.5-pro</option>
+          </select>
         </div>
 
         <div class="form-group">
@@ -245,7 +232,7 @@
 
         <div class="form-group" style="grid-column: 1 / -1;">
           <label>📄 Adjuntar Tema en PDF:</label>
-          <div class="file-dropzone" id="dropzone" onclick="document.getElementById('pdfFile').click()">
+          <div class="file-dropzone" onclick="document.getElementById('pdfFile').click()">
             <span id="fileName">Haz clic para seleccionar el archivo PDF de la unidad didáctica</span>
             <input type="file" id="pdfFile" accept="application/pdf" style="display:none" onchange="handleFileSelect(event)">
           </div>
@@ -259,16 +246,16 @@
       </div>
 
       <div class="loading-spinner" id="loadingSpinner">
-        ⏳ Procesando la unidad didáctica con Gemini IA... Por favor, espera unos segundos.
+        ⏳ Procesando unidad didáctica con IA... Por favor, espera unos segundos.
       </div>
     </div>
 
     <!-- Resultados en Pestañas -->
     <div class="card">
       <div class="tabs">
-        <button class="tab-btn active" onclick="switchTab('tab1', event)">📖 1. Resumen de Estudio</button>
-        <button class="tab-btn" onclick="switchTab('tab2', event)">🌐 2. Dashboard HTML</button>
-        <button class="tab-btn" onclick="switchTab('tab3', event)">🎮 3. Juego Kahoot</button>
+        <button class="tab-btn active" id="tabBtn1" onclick="switchTab('tab1', 'tabBtn1')">📖 1. Resumen de Estudio</button>
+        <button class="tab-btn" id="tabBtn2" onclick="switchTab('tab2', 'tabBtn2')">🌐 2. Dashboard HTML</button>
+        <button class="tab-btn" id="tabBtn3" onclick="switchTab('tab3', 'tabBtn3')">🎮 3. Juego Kahoot</button>
       </div>
 
       <!-- Pestaña 1: Resumen -->
@@ -310,8 +297,8 @@
     function handleFileSelect(event) {
       const file = event.target.files[0];
       if (file && file.type === "application/pdf") {
-        document.getElementById('fileName').innerText = `📄 Archivo cargado: ${file.name} (${(file.size / (1024 * 1024)).toFixed(2)} MB)`;
-        document.getElementById('dropzone').classList.add('active');
+        const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
+        document.getElementById('fileName').innerText = `📄 Archivo cargado: ${file.name} (${fileSizeMB} MB)`;
         
         const reader = new FileReader();
         reader.onload = function(e) {
@@ -323,20 +310,21 @@
       }
     }
 
-    function switchTab(tabId, evt) {
+    function switchTab(tabId, btnId) {
       document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
       document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
       
-      if (evt && evt.target) {
-        evt.target.classList.add('active');
-      }
+      const activeBtn = document.getElementById(btnId) || event.target;
+      activeBtn.classList.add('active');
       document.getElementById(tabId).classList.add('active');
     }
 
     async function callGemini(promptText, usePDF = true) {
       const apiKey = document.getElementById('apiKey').value.trim();
+      const selectedModel = document.getElementById('modelSelect').value;
+
       if (!apiKey) {
-        alert("Por favor, introduce tu API Key gratuita de Gemini.");
+        alert("Por favor, introduce tu API Key de Gemini.");
         return null;
       }
 
@@ -348,50 +336,91 @@
       const spinner = document.getElementById('loadingSpinner');
       spinner.style.display = 'block';
 
-      // Endpoint oficial Gemini 1.5 Flash
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+      // 1. Probar con modelos candidatos en orden de prioridad
+      const candidateModels = [
+        selectedModel,
+        "gemini-2.5-flash",
+        "gemini-2.0-flash",
+        "gemini-1.5-flash-latest",
+        "gemini-1.5-flash",
+        "gemini-1.5-pro"
+      ];
+      const uniqueCandidates = [...new Set(candidateModels)];
 
-      const contents = [{ parts: [] }];
-      
-      if (usePDF && base64PDF) {
-        contents[0].parts.push({
-          inline_data: {
-            mime_type: "application/pdf",
-            data: base64PDF
+      for (let modelName of uniqueCandidates) {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
+        const contents = [{ parts: [] }];
+        
+        if (usePDF && base64PDF) {
+          contents[0].parts.push({
+            inline_data: { mime_type: "application/pdf", data: base64PDF }
+          });
+        }
+        contents[0].parts.push({ text: promptText });
+
+        try {
+          const response = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ contents })
+          });
+          const data = await response.json();
+
+          if (!data.error && data.candidates && data.candidates[0]?.content?.parts[0]?.text) {
+            spinner.style.display = 'none';
+            return data.candidates[0].content.parts[0].text;
           }
-        });
+
+          if (data.error && (data.error.code === 400 || data.error.code === 403)) {
+            spinner.style.display = 'none';
+            alert(`Error en tu clave API de Google:\n${data.error.message}`);
+            return null;
+          }
+        } catch (err) {
+          console.warn(`Fallo con el modelo ${modelName}:`, err);
+        }
       }
 
-      contents[0].parts.push({ text: promptText });
-
+      // 2. Si fallan los nombres estáticos, consultar dinámicamente qué modelos admite tu API Key
       try {
-        const response = await fetch(url, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ contents })
-        });
+        const listRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
+        const listData = await listRes.json();
+        
+        if (listData.models) {
+          const validModel = listData.models.find(m => 
+            m.supportedGenerationMethods && m.supportedGenerationMethods.includes('generateContent')
+          );
+          
+          if (validModel) {
+            const autoModelName = validModel.name.replace('models/', '');
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/${autoModelName}:generateContent?key=${apiKey}`;
+            const contents = [{ parts: [] }];
+            
+            if (usePDF && base64PDF) {
+              contents[0].parts.push({ inline_data: { mime_type: "application/pdf", data: base64PDF } });
+            }
+            contents[0].parts.push({ text: promptText });
 
-        const data = await response.json();
-        spinner.style.display = 'none';
-
-        // Manejo específico de errores devueltos por la API de Google
-        if (data.error) {
-          console.error("Detalle del error:", data.error);
-          alert(`Error de Google AI (${data.error.code || 'API'}): ${data.error.message}`);
-          return null;
-        }
-
-        if (data.candidates && data.candidates[0]?.content?.parts[0]?.text) {
-          return data.candidates[0].content.parts[0].text;
-        } else {
-          alert("La API respondió pero no generó texto. Verifica que el PDF sea legible y no esté protegido.");
-          return null;
+            const response = await fetch(url, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ contents })
+            });
+            const data = await response.json();
+            
+            if (data.candidates && data.candidates[0]?.content?.parts[0]?.text) {
+              spinner.style.display = 'none';
+              return data.candidates[0].content.parts[0].text;
+            }
+          }
         }
       } catch (err) {
-        spinner.style.display = 'none';
-        alert("Error de conexión con la red: " + err.message);
-        return null;
+        console.error("Error al autodetectar modelos:", err);
       }
+
+      spinner.style.display = 'none';
+      alert("No se pudo conectar con los modelos de Gemini. Comprueba que tu API Key esté correctamente generada en Google AI Studio.");
+      return null;
     }
 
     async function generateTask(taskNum) {
@@ -399,11 +428,11 @@
 
       if (taskNum === 1) {
         const prompt = `Actúa como una maestra de Educación Primaria. Elabora un RESUMEN DE ESTUDIO completo y perfectamente maquetado del tema adjunto para el curso ${grade}.
-Sigue estas pautas estrictas:
+Sigue estas pautas strictly:
 1. Encabezado con título del tema y subtítulo para ${grade}.
 2. Párrafo introductorio motivador.
 3. Esquema visual inicial en texto con cajas/flechas ([CÉLULA] -> [TEJIDO] -> ...).
-4. Epígrafes numerados usando viñetas visuales (🔹, 💡, 📌) y términos clave en negrita.
+4. Epígrafes numerados usando viñetas visuales (🔹, 💡, 📌) y términos en negrita.
 5. Tablas explicativas o clasificaciones si el tema lo requiere.
 6. Cierre obligatorio bajo el título "✅ Lo que debes recordar" con los puntos clave esenciales.`;
 
@@ -412,6 +441,7 @@ Sigue estas pautas estrictas:
           generatedSummary = result;
           document.getElementById('outputTask1').innerHTML = marked.parse(result);
           document.getElementById('btnTask2').disabled = false;
+          switchTab('tab1', 'tabBtn1');
         }
       } 
       else if (taskNum === 2) {
@@ -421,7 +451,7 @@ RESUMEN BASE:
 ${generatedSummary}
 
 REQUISITOS DEL DASHBOARD HTML:
-1. Código HTML5 completo en un solo bloque (incluye estilos en etiqueta <style>).
+1. Código HTML5 completo en un solo bloque (incluye estilo en etiqueta <style>).
 2. Paleta de colores educativa (Azul #2B6CB0, Verde #319795, Fondo #F4F7FB).
 3. Utiliza elementos desplegables (<details> y <summary>) para que los niños puedan hacer clic y revelar la información.
 4. Incluye un bloque final destacado en verde con "✅ Lo que debes recordar".
@@ -438,10 +468,7 @@ REQUISITOS DEL DASHBOARD HTML:
           iframe.contentWindow.document.close();
 
           document.getElementById('btnTask3').disabled = false;
-          
-          // Cambiar a la pestaña de Dashboard
-          const tabBtn = document.querySelectorAll('.tab-btn')[1];
-          switchTab('tab2', { target: tabBtn });
+          switchTab('tab2', 'tabBtn2');
         }
       } 
       else if (taskNum === 3) {
@@ -463,10 +490,7 @@ Asegúrate de cubrir todos los puntos clave del tema de forma variada (conceptos
         const result = await callGemini(prompt, false);
         if (result) {
           document.getElementById('outputTask3').innerHTML = marked.parse(result);
-          
-          // Cambiar a la pestaña de Kahoot
-          const tabBtn = document.querySelectorAll('.tab-btn')[2];
-          switchTab('tab3', { target: tabBtn });
+          switchTab('tab3', 'tabBtn3');
         }
       }
     }
@@ -474,12 +498,8 @@ Asegúrate de cubrir todos los puntos clave del tema de forma variada (conceptos
     function copyToClipboard(elementId, isValue = false) {
       const el = document.getElementById(elementId);
       const text = isValue ? el.value : el.innerText;
-      if (!text) return;
-
       navigator.clipboard.writeText(text).then(() => {
         alert("¡Copiado al portapapeles!");
-      }).catch(err => {
-        alert("Error al copiar: " + err.message);
       });
     }
 
