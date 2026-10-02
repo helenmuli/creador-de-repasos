@@ -1,492 +1,511 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Asistente Docente - Generador de Materiales de Primaria</title>
-  <!-- Marked.js para renderizar Markdown -->
-  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-  <style>
-    :root {
-      --primary: #2B6CB0;
-      --primary-dark: #1A365D;
-      --secondary: #319795;
-      --accent: #38A169;
-      --bg: #F4F7FB;
-      --card-bg: #FFFFFF;
-      --text: #2D3748;
-    }
-
-    body {
-      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-      background-color: var(--bg);
-      color: var(--text);
-      margin: 0;
-      padding: 20px;
-      line-height: 1.6;
-    }
-
-    .container {
-      max-width: 1100px;
-      margin: 0 auto;
-    }
-
-    header {
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      color: white;
-      padding: 25px;
-      border-radius: 12px;
-      text-align: center;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-      margin-bottom: 25px;
-    }
-
-    header h1 { margin: 0 0 8px 0; font-size: 26px; }
-    header p { margin: 0; opacity: 0.9; font-size: 15px; }
-
-    .card {
-      background: var(--card-bg);
-      border-radius: 12px;
-      padding: 25px;
-      margin-bottom: 25px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-    }
-
-    .form-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 20px;
-    }
-
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    label { font-weight: 600; color: var(--primary-dark); font-size: 14px; }
-
-    input[type="password"], input[type="text"], select, button {
-      padding: 12px;
-      border: 1px solid #CBD5E0;
-      border-radius: 8px;
-      font-size: 15px;
-      outline: none;
-    }
-
-    input[type="file"] {
-      padding: 10px;
-      background: #EDF2F7;
-      border: 1px solid #CBD5E0;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-
-    input:focus, select:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(43, 108, 176, 0.2);
-    }
-
-    .btn-group {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin-top: 20px;
-    }
-
-    .btn {
-      background-color: var(--primary);
-      color: white;
-      border: none;
-      font-weight: 600;
-      padding: 12px 20px;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: background 0.2s, transform 0.1s;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .btn:hover { background-color: var(--primary-dark); transform: translateY(-1px); }
-    .btn:disabled { background-color: #A0AEC0; cursor: not-allowed; transform: none; }
-    .btn-secondary { background-color: var(--secondary); }
-    .btn-accent { background-color: var(--accent); }
-
-    .tabs {
-      display: flex;
-      gap: 8px;
-      border-bottom: 2px solid #E2E8F0;
-      margin-bottom: 20px;
-    }
-
-    .tab-btn {
-      padding: 10px 18px;
-      background: none;
-      border: none;
-      border-bottom: 3px solid transparent;
-      font-weight: 600;
-      color: #718096;
-      cursor: pointer;
-      border-radius: 0;
-    }
-
-    .tab-btn.active {
-      color: var(--primary);
-      border-bottom-color: var(--primary);
-    }
-
-    .tab-content { display: none; }
-    .tab-content.active { display: block; }
-
-    .output-box {
-      background: #FAFAFA;
-      border: 1px solid #E2E8F0;
-      border-radius: 8px;
-      padding: 20px;
-      min-height: 200px;
-      max-height: 600px;
-      overflow-y: auto;
-    }
-
-    .action-bar {
-      display: flex;
-      justify-content: flex-end;
-      gap: 10px;
-      margin-bottom: 12px;
-    }
-
-    .btn-sm { padding: 6px 12px; font-size: 13px; }
-
-    iframe.preview-frame {
-      width: 100%;
-      height: 500px;
-      border: 1px solid #CBD5E0;
-      border-radius: 8px;
-      background: white;
-    }
-
-    .loading-spinner {
-      display: none;
-      text-align: center;
-      padding: 20px;
-      font-weight: 600;
-      color: var(--primary);
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 10px;
-    }
-
-    th, td {
-      border: 1px solid #CBD5E0;
-      padding: 8px 12px;
-      text-align: left;
-    }
-
-    th { background-color: #EDF2F7; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Asistente docente · Materiales de Primaria</title>
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mammoth@1.8.0/mammoth.browser.min.js"></script>
+<style>
+  :root{--ink:#1d2733;--muted:#5d6b7a;--paper:#f2f5f8;--card:#fff;--line:#d5dde5;--blue:#2b5d8c;--blue-d:#1b4268;--pencil:#f2b705;--ok:#2f7d5b;--err:#b3382c}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+  header{background:var(--blue-d);color:#fff;padding:22px 24px;border-bottom:6px solid var(--pencil)}
+  header h1{margin:0;font-size:1.5rem;letter-spacing:-.01em}
+  header p{margin:4px 0 0;color:#c9d9e8}
+  main{max-width:1180px;margin:0 auto;padding:24px;display:grid;grid-template-columns:340px 1fr;gap:24px;align-items:start}
+  @media(max-width:860px){main{grid-template-columns:1fr}}
+  aside,.panel{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:20px}
+  label{display:block;font-weight:600;margin:14px 0 5px;font-size:.92rem}
+  label:first-child{margin-top:0}
+  input[type=password],input[type=text],select{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:6px;font:inherit;background:#fff}
+  :focus-visible{outline:3px solid var(--pencil);outline-offset:2px}
+  .hint{font-size:.82rem;color:var(--muted);margin-top:4px}
+  .hint a{color:var(--blue)}
+  .row{display:flex;gap:8px;align-items:center}
+  .check{display:flex;gap:6px;align-items:center;font-weight:400;font-size:.85rem;margin-top:8px}
+  .drop{display:block;border:2px dashed var(--line);border-radius:8px;padding:16px;text-align:center;cursor:pointer;color:var(--muted);font-weight:400}
+  .drop:hover,.drop.ok{border-color:var(--blue);color:var(--ink)}
+  .drop.ok{background:#eef4fa}
+  hr{border:0;border-top:1px solid var(--line);margin:20px 0}
+  .step{display:flex;gap:10px;margin-bottom:10px}
+  .step .n{flex:none;width:28px;height:28px;border-radius:50%;background:var(--line);color:var(--muted);display:grid;place-items:center;font-weight:700;font-size:.9rem;margin-top:6px}
+  .step.ready .n{background:var(--pencil);color:var(--ink)}
+  .step.done .n{background:var(--ok);color:#fff}
+  button{font:inherit;cursor:pointer;border-radius:6px;border:1px solid var(--blue);background:var(--blue);color:#fff;padding:9px 14px;font-weight:600}
+  button:hover:not(:disabled){background:var(--blue-d)}
+  button:disabled{opacity:.45;cursor:not-allowed}
+  button.ghost{background:#fff;color:var(--blue)}
+  button.ghost:hover:not(:disabled){background:#eef4fa}
+  .step button{flex:1;text-align:left}
+  #status{margin-top:14px;padding:10px 12px;border-radius:6px;font-size:.9rem;display:none;white-space:pre-wrap}
+  #status.busy{display:block;background:#fff7dc;border:1px solid var(--pencil)}
+  #status.error{display:block;background:#fbeceb;border:1px solid var(--err);color:var(--err)}
+  #status.ok{display:block;background:#e8f4ee;border:1px solid var(--ok);color:var(--ok)}
+  .tabs{display:flex;gap:4px;border-bottom:2px solid var(--line);margin:-20px -20px 16px;padding:0 12px;flex-wrap:wrap}
+  .tabs button{background:none;border:0;border-bottom:3px solid transparent;border-radius:0;color:var(--muted);padding:14px 12px;margin-bottom:-2px}
+  .tabs button.on{color:var(--ink);border-bottom-color:var(--pencil)}
+  .tabs button:hover:not(:disabled){background:none;color:var(--ink)}
+  .pane{display:none}.pane.on{display:block}
+  .bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+  .bar button{padding:6px 11px;font-size:.88rem}
+  .out{min-height:260px;line-height:1.65}
+  .empty{color:var(--muted);text-align:center;padding:70px 10px}
+  .out h1,.out h2,.out h3{color:var(--blue-d);line-height:1.25}
+  .out table{border-collapse:collapse;width:100%;font-size:.88rem;display:block;overflow-x:auto}
+  .out th,.out td{border:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
+  .out th{background:#eef4fa}
+  iframe{width:100%;height:620px;border:1px solid var(--line);border-radius:6px;background:#fff}
+</style>
 </head>
 <body>
+<header>
+  <h1>Asistente docente de Primaria</h1>
+  <p>Sube el tema en PDF o Word y genera resumen, dashboard y cuestionario para 4.º, 5.º o 6.º.</p>
+</header>
 
-  <div class="container">
-    <header>
-      <h1>📚 Asistente Docente de Primaria</h1>
-      <p>Generador progresivo de materiales didácticos para 4.º, 5.º y 6.º de Primaria</p>
-    </header>
+<main>
+  <aside>
+    <label for="apiKey">Clave API de Gemini</label>
+    <input type="password" id="apiKey" autocomplete="off" placeholder="AIza…">
+    <div class="hint"><a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener">Consigue una clave gratis en Google AI Studio</a></div>
+    <label class="check"><input type="checkbox" id="remember"> Recordar la clave en este navegador</label>
 
-    <div class="card">
-      <div class="form-grid">
-        <div class="form-group">
-          <label for="apiKey">🔑 Clave API de Gemini:</label>
-          <input type="password" id="apiKey" placeholder="Pega tu API Key de Google AI Studio...">
-          <small><a href="https://aistudio.google.com/app/apikey" target="_blank" style="color: var(--primary);">Obtener API Key gratuita</a></small>
-        </div>
-
-        <div class="form-group">
-          <label for="modelSelect">🤖 Modelo de IA:</label>
-          <select id="modelSelect">
-            <option value="gemini-2.5-flash" selected>gemini-2.5-flash (Recomendado)</option>
-            <option value="gemini-2.0-flash">gemini-2.0-flash</option>
-            <option value="gemini-1.5-flash">gemini-1.5-flash</option>
-            <option value="gemini-1.5-pro">gemini-1.5-pro</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label for="grade">🎓 Curso Escolar:</label>
-          <select id="grade">
-            <option value="4.º de Primaria">4.º de Primaria</option>
-            <option value="5.º de Primaria">5.º de Primaria</option>
-            <option value="6.º de Primaria" selected>6.º de Primaria</option>
-          </select>
-        </div>
-
-        <div class="form-group" style="grid-column: 1 / -1;">
-          <label for="pdfFile">📄 Adjuntar Tema en PDF:</label>
-          <input type="file" id="pdfFile" accept="application/pdf" onchange="handleFileSelect(event)">
-          <small id="fileInfo" style="color: #38A169; font-weight: 600; margin-top: 4px;"></small>
-        </div>
-      </div>
-
-      <div class="btn-group">
-        <button class="btn" id="btnTask1" onclick="generateTask(1)">📖 1. Generar Resumen (Word)</button>
-        <button class="btn btn-secondary" id="btnTask2" onclick="generateTask(2)" disabled>🌐 2. Generar Dashboard HTML</button>
-        <button class="btn btn-accent" id="btnTask3" onclick="generateTask(3)" disabled>🎮 3. Generar Kahoot (30+ preg.)</button>
-      </div>
-
-      <div class="loading-spinner" id="loadingSpinner">
-        ⏳ Procesando unidad didáctica con IA... Por favor, espera unos segundos.
-      </div>
+    <label for="model">Modelo</label>
+    <div class="row">
+      <select id="model">
+        <option>gemini-2.5-flash</option>
+        <option>gemini-2.5-flash-lite</option>
+        <option>gemini-2.5-pro</option>
+      </select>
+      <button class="ghost" id="btnModels" title="Pregunta a Google qué modelos admite tu clave">Probar clave</button>
     </div>
 
-    <div class="card">
-      <div class="tabs">
-        <button class="tab-btn active" id="tabBtn1" onclick="switchTab('tab1', 'tabBtn1')">📖 1. Resumen de Estudio</button>
-        <button class="tab-btn" id="tabBtn2" onclick="switchTab('tab2', 'tabBtn2')">🌐 2. Dashboard HTML</button>
-        <button class="tab-btn" id="tabBtn3" onclick="switchTab('tab3', 'tabBtn3')">🎮 3. Juego Kahoot</button>
-      </div>
+    <label for="grade">Curso</label>
+    <select id="grade">
+      <option>4.º de Primaria</option>
+      <option>5.º de Primaria</option>
+      <option selected>6.º de Primaria</option>
+    </select>
 
-      <div id="tab1" class="tab-content active">
-        <div class="action-bar">
-          <button class="btn btn-sm" onclick="copyToClipboard('outputTask1')">📋 Copiar Texto</button>
-        </div>
-        <div id="outputTask1" class="output-box">
-          <p style="color: #718096; text-align: center;">Adjunta un archivo PDF y pulsa "1. Generar Resumen" para comenzar.</p>
-        </div>
-      </div>
+    <label for="pdf">Tema en PDF o Word</label>
+    <label class="drop" id="drop" for="pdf"><span id="pdfName">Elige el PDF o Word (.docx) de la unidad</span></label>
+    <input type="file" id="pdf" accept=".pdf,.docx,.txt,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain" hidden>
 
-      <div id="tab2" class="tab-content">
-        <div class="action-bar">
-          <button class="btn btn-sm" onclick="copyToClipboard('outputTask2Code', true)">📋 Copiar Código HTML</button>
-          <button class="btn btn-sm btn-secondary" onclick="downloadHTML()">💾 Descargar .html</button>
-        </div>
-        <iframe id="previewDashboard" class="preview-frame"></iframe>
-        <textarea id="outputTask2Code" style="display:none;"></textarea>
-      </div>
+    <hr>
+    <div class="step" id="s1"><span class="n">1</span><button id="b1" disabled>Generar resumen</button></div>
+    <div class="step" id="s2"><span class="n">2</span><button id="b2" disabled>Generar dashboard</button></div>
+    <div class="step" id="s3"><span class="n">3</span><button id="b3" disabled>Generar cuestionario interactivo</button></div>
+    <div class="hint">El dashboard y el cuestionario se crean a partir del resumen.</div>
+    <div id="status" role="status" aria-live="polite"></div>
+  </aside>
 
-      <div id="tab3" class="tab-content">
-        <div class="action-bar">
-          <button class="btn btn-sm" onclick="copyToClipboard('outputTask3')">📋 Copiar Cuestionario</button>
-        </div>
-        <div id="outputTask3" class="output-box">
-          <p style="color: #718096; text-align: center;">Genera primero el resumen para poder crear las preguntas de Kahoot.</p>
-        </div>
-      </div>
+  <section class="panel">
+    <div class="tabs" role="tablist">
+      <button class="on" data-tab="p1">Resumen</button>
+      <button data-tab="p2">Dashboard</button>
+      <button data-tab="p3">Cuestionario</button>
     </div>
-  </div>
 
-  <script>
-    let base64PDF = null;
-    let generatedSummary = "";
+    <div class="pane on" id="p1">
+      <div class="bar">
+        <button class="ghost" id="dlWord" disabled>Descargar Word</button>
+        <button class="ghost" id="cp1" disabled>Copiar texto</button>
+      </div>
+      <div class="out" id="o1"><div class="empty">Elige un archivo y pulsa “Generar resumen”.</div></div>
+    </div>
 
-    function handleFileSelect(event) {
-      const file = event.target.files[0];
-      const infoSpan = document.getElementById('fileInfo');
+    <div class="pane" id="p2">
+      <div class="bar">
+        <button class="ghost" id="dlHtml" disabled>Descargar .html</button>
+        <button class="ghost" id="cpHtml" disabled>Copiar código</button>
+      </div>
+      <iframe id="frame" title="Vista previa del dashboard" sandbox="allow-scripts"></iframe>
+    </div>
 
-      if (file && file.type === "application/pdf") {
-        const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
-        infoSpan.innerText = `✓ Archivo cargado correctamente: ${file.name} (${fileSizeMB} MB)`;
-        
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          base64PDF = e.target.result.split(',')[1];
-        };
-        reader.readAsDataURL(file);
-      } else if (file) {
-        infoSpan.innerText = "";
-        alert("Por favor, selecciona un archivo que sea un PDF.");
-      }
+    <div class="pane" id="p3">
+      <div class="bar">
+        <button class="ghost" id="dlQuiz" disabled>Descargar .html</button>
+        <button class="ghost" id="cpQuiz" disabled>Copiar código</button>
+        <button class="ghost" id="dlCsv" disabled>CSV para Kahoot</button>
+      </div>
+      <iframe id="frame3" title="Vista previa del cuestionario" sandbox="allow-scripts" srcdoc="<p style='font-family:system-ui;color:#5d6b7a;text-align:center;margin-top:90px'>Genera primero el resumen y después el cuestionario.</p>"></iframe>
+    </div>
+  </section>
+</main>
+
+<script>
+const $ = id => document.getElementById(id);
+const API = 'https://generativelanguage.googleapis.com/v1beta';
+const state = { pdf: null, text: null, questions: [], quizHtml: '', summary: '', html: '', quiz: '' };
+
+/* ---------- utilidades ---------- */
+function status(msg, kind) {
+  const s = $('status');
+  s.className = msg ? kind : '';
+  s.textContent = msg || '';
+}
+function setStep(n, cls) { $('s' + n).className = 'step ' + cls; }
+function tab(id) {
+  document.querySelectorAll('.tabs button').forEach(b => b.classList.toggle('on', b.dataset.tab === id));
+  document.querySelectorAll('.pane').forEach(p => p.classList.toggle('on', p.id === id));
+}
+document.querySelectorAll('.tabs button').forEach(b => b.onclick = () => tab(b.dataset.tab));
+function download(name, text, type) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob(['\ufeff', text], { type }));
+  a.download = name; a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+async function copy(text) {
+  try { await navigator.clipboard.writeText(text); status('Copiado al portapapeles.', 'ok'); }
+  catch { status('No se pudo copiar. Selecciona el texto y copia con Ctrl+C.', 'error'); }
+}
+const getKey = () => $('apiKey').value.replace(/\s+/g, '');
+
+/* ---------- clave guardada (opcional) ---------- */
+try {
+  const k = localStorage.getItem('gemini_key');
+  if (k) { $('apiKey').value = k; $('remember').checked = true; }
+} catch (_) {}
+function persistKey() {
+  try {
+    if ($('remember').checked) localStorage.setItem('gemini_key', getKey());
+    else localStorage.removeItem('gemini_key');
+  } catch (_) {}
+}
+
+/* ---------- PDF ---------- */
+const hasSource = () => !!(state.pdf || state.text);
+function sourceLoaded(f) {
+  $('pdfName').textContent = `${f.name} (${(f.size / 1048576).toFixed(1)} MB)`;
+  $('drop').classList.add('ok');
+  $('b1').disabled = false; setStep(1, 'ready');
+  status('');
+}
+$('pdf').onchange = async e => {
+  const f = e.target.files[0];
+  if (!f) return;
+  const ext = f.name.split('.').pop().toLowerCase();
+  state.pdf = null; state.text = null;
+  if (f.size > 20 * 1024 * 1024) return status('El archivo pesa más de 20 MB. Reduce su tamaño o divídelo.', 'error');
+  if (ext === 'pdf') {
+    const r = new FileReader();
+    r.onload = () => { state.pdf = r.result.split(',')[1]; sourceLoaded(f); };
+    r.readAsDataURL(f);
+  } else if (ext === 'docx') {
+    try {
+      const res = await mammoth.extractRawText({ arrayBuffer: await f.arrayBuffer() });
+      if (!res.value.trim()) return status('El Word no contiene texto legible (¿solo imágenes?).', 'error');
+      state.text = res.value; sourceLoaded(f);
+    } catch (err) {
+      status('No se pudo leer el Word: ' + err.message, 'error');
     }
+  } else if (ext === 'txt') {
+    state.text = await f.text(); sourceLoaded(f);
+  } else if (ext === 'doc') {
+    status('El formato .doc antiguo no se puede leer. Ábrelo en Word y guárdalo como .docx o PDF.', 'error');
+  } else {
+    status('Formato no admitido. Usa PDF, .docx o .txt.', 'error');
+  }
+};
 
-    function switchTab(tabId, btnId) {
-      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-      
-      const activeBtn = document.getElementById(btnId) || event.target;
-      activeBtn.classList.add('active');
-      document.getElementById(tabId).classList.add('active');
-    }
-
-    async function callGemini(promptText, usePDF = true) {
-      const apiKey = document.getElementById('apiKey').value.trim();
-      const selectedModel = document.getElementById('modelSelect').value;
-
-      if (!apiKey) {
-        alert("Por favor, introduce tu API Key de Gemini.");
-        return null;
-      }
-
-      if (usePDF && !base64PDF) {
-        alert("Por favor, selecciona un archivo PDF en la casilla correspondiente.");
-        return null;
-      }
-
-      const spinner = document.getElementById('loadingSpinner');
-      spinner.style.display = 'block';
-
-      const parts = [];
-      if (usePDF && base64PDF) {
-        parts.push({
-          inlineData: {
-            mimeType: "application/pdf",
-            data: base64PDF
-          }
-        });
-      }
-      parts.push({ text: promptText });
-
-      const requestBody = { contents: [{ parts: parts }] };
-
-      // Lista de URLs para intentar en orden
-      const endpoints = [
-        `https://generativelanguage.googleapis.com/v1beta/models/${selectedModel}:generateContent?key=${apiKey}`,
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`
-      ];
-
-      let lastErrorMessage = "";
-
-      for (let url of [...new Set(endpoints)]) {
-        try {
-          const response = await fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(requestBody)
-          });
-
-          const data = await response.json();
-
-          if (response.ok && data.candidates && data.candidates[0]?.content?.parts[0]?.text) {
-            spinner.style.display = 'none';
-            return data.candidates[0].content.parts[0].text;
-          }
-
-          if (data.error) {
-            console.error("Detalle de error:", data.error);
-            lastErrorMessage = `${data.error.message} (Código ${data.error.code})`;
-            
-            if (data.error.code === 400 && data.error.message.includes("API key")) {
-              spinner.style.display = 'none';
-              alert("La API Key introducida no es válida. Revisa que no tenga espacios adicionales.");
-              return null;
-            }
-          }
-        } catch (err) {
-          console.error("Fallo de red al conectar:", err);
-          lastErrorMessage = err.message;
-        }
-      }
-
-      spinner.style.display = 'none';
-      alert(`No se pudo generar el contenido.\n\nMotivo reported por Google: ${lastErrorMessage}`);
-      return null;
-    }
-
-    async function generateTask(taskNum) {
-      const grade = document.getElementById('grade').value;
-
-      if (taskNum === 1) {
-        const prompt = `Actúa como una maestra de Educación Primaria. Elabora un RESUMEN DE ESTUDIO completo y perfectamente maquetado del tema adjunto para el curso ${grade}.
-Sigue estas pautas estrictas:
-1. Encabezado con título del tema y subtítulo para ${grade}.
-2. Párrafo introductorio motivador.
-3. Esquema visual inicial en texto con cajas/flechas ([CÉLULA] -> [TEJIDO] -> ...).
-4. Epígrafes numerados usando viñetas visuales (🔹, 💡, 📌) y términos en negrita.
-5. Tablas explicativas o clasificaciones si el tema lo requiere.
-6. Cierre obligatorio bajo el título "✅ Lo que debes recordar" con los puntos clave esenciales.`;
-
-        const result = await callGemini(prompt, true);
-        if (result) {
-          generatedSummary = result;
-          
-          // Renderizar markdown de forma segura
-          if (typeof marked !== 'undefined') {
-            document.getElementById('outputTask1').innerHTML = marked.parse(result);
-          } else {
-            document.getElementById('outputTask1').innerText = result;
-          }
-
-          document.getElementById('btnTask2').disabled = false;
-          switchTab('tab1', 'tabBtn1');
-        }
-      } 
-      else if (taskNum === 2) {
-        const prompt = `A partir del siguiente resumen de estudio para ${grade}, genera el código completo HTML y CSS de un Dashboard Interactivo para Google Classroom:
-
-RESUMEN BASE:
-${generatedSummary}
-
-REQUISITOS DEL DASHBOARD HTML:
-1. Código HTML5 completo en un solo bloque (incluye estilo en etiqueta <style>).
-2. Paleta de colores educativa (Azul #2B6CB0, Verde #319795, Fondo #F4F7FB).
-3. Utiliza elementos desplegables (<details> y <summary>) para que los niños puedan hacer clic y revelar la información.
-4. Incluye un bloque final destacado en verde con "✅ Lo que debes recordar".
-5. Devuelve ÚNICAMENTE el código HTML empaquetado en un bloque de código \`\`\`html.`;
-
-        const result = await callGemini(prompt, false);
-        if (result) {
-          const cleanHTML = result.replace(/```html/g, '').replace(/```/g, '').trim();
-          document.getElementById('outputTask2Code').value = cleanHTML;
-          
-          const iframe = document.getElementById('previewDashboard');
-          iframe.contentWindow.document.open();
-          iframe.contentWindow.document.write(cleanHTML);
-          iframe.contentWindow.document.close();
-
-          document.getElementById('btnTask3').disabled = false;
-          switchTab('tab2', 'tabBtn2');
-        }
-      } 
-      else if (taskNum === 3) {
-        const prompt = `A partir del contenido del resumen de estudio para ${grade}, genera un cuestionario interactivo tipo Kahoot de AL MENOS 30 PREGUNTAS.
-
-Crea una tabla en formato Markdown con las siguientes columnas:
-1. N.º
-2. Pregunta (clara, directa y adaptada a ${grade})
-3. Opción A
-4. Opción B
-5. Opción C
-6. Opción D
-7. Respuesta Correcta (A, B, C o D)
-8. Tiempo (20s / 30s)
-9. Explicación corta (retroalimentación pedagógica)
-
-Asegúrate de cubrir todos los puntos clave del tema de forma variada (conceptos, definiciones, verdadero/falso y razonamiento).`;
-
-        const result = await callGemini(prompt, false);
-        if (result) {
-          if (typeof marked !== 'undefined') {
-            document.getElementById('outputTask3').innerHTML = marked.parse(result);
-          } else {
-            document.getElementById('outputTask3').innerText = result;
-          }
-          switchTab('tab3', 'tabBtn3');
-        }
-      }
-    }
-
-    function copyToClipboard(elementId, isValue = false) {
-      const el = document.getElementById(elementId);
-      const text = isValue ? el.value : el.innerText;
-      navigator.clipboard.writeText(text).then(() => {
-        alert("¡Copiado al portapapeles!");
+/* ---------- Gemini ---------- */
+async function gemini(model, parts, json = false) {
+  const url = `${API}/models/${encodeURIComponent(model)}:generateContent`;
+  let last;
+  for (let i = 0; i < 3; i++) {
+    let res, data = {};
+    try {
+      res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-goog-api-key': getKey() },
+        body: JSON.stringify({ contents: [{ role: 'user', parts }], ...(json ? { generationConfig: { responseMimeType: 'application/json' } } : {}) })
       });
+      data = await res.json().catch(() => ({}));
+    } catch (e) {
+      throw new Error('Sin conexión con Google. Revisa tu internet o bloqueadores de red. (' + e.message + ')');
     }
+    if (res.ok && !data.error) {
+      const c = data.candidates && data.candidates[0];
+      const text = c && c.content && c.content.parts ? c.content.parts.map(p => p.text || '').join('') : '';
+      if (!text) {
+        const why = (data.promptFeedback && data.promptFeedback.blockReason) || (c && c.finishReason) || 'respuesta vacía';
+        throw new Error('El modelo no devolvió texto: ' + why);
+      }
+      return text;
+    }
+    const e = data.error || {};
+    last = { code: e.code || res.status, msg: e.message || ('HTTP ' + res.status) };
+    if ((last.code === 429 || last.code === 503) && i < 2) {
+      status(`Google está saturado (${last.code}). Reintentando…`, 'busy');
+      await new Promise(r => setTimeout(r, 3000 * (i + 1)));
+      continue;
+    }
+    break;
+  }
+  const hints = {
+    400: /api key/i.test(last.msg) ? 'La clave no es válida. Cópiala de nuevo desde AI Studio.' : 'Petición rechazada (¿PDF demasiado grande o dañado?).',
+    403: 'La clave no tiene permiso para este modelo o la API no está activada.',
+    404: 'Ese modelo no existe para tu clave. Pulsa “Probar clave” y elige uno de la lista.',
+    429: 'Has superado la cuota gratuita. Espera un minuto o prueba gemini-2.5-flash-lite.',
+    503: 'El modelo está saturado. Inténtalo de nuevo en unos minutos.'
+  };
+  const noFree = last.code === 429 && /limit:\s*0\b/.test(last.msg);
+  const err = new Error(noFree
+    ? `El modelo ${model} no tiene cuota gratuita en tu cuenta (límite 0). No es que hayas gastado tu cuota: ese modelo no está incluido en el plan gratuito.`
+    : `${hints[last.code] || 'Error de Google.'}\nDetalle: ${last.msg}`);
+  err.code = last.code; err.noFree = noFree;
+  throw err;
+}
 
-    function downloadHTML() {
-      const htmlContent = document.getElementById('outputTask2Code').value;
-      if (!htmlContent) return;
-      
-      const blob = new Blob([htmlContent], { type: 'text/html' });
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = 'dashboard_classroom.html';
-      a.click();
+async function run(n, prompt, withPdf, onOk, json = false) {
+  if (!getKey()) return status('Pega primero tu clave API de Gemini.', 'error');
+  persistKey();
+  const btns = ['b1', 'b2', 'b3'].map($);
+  btns.forEach(b => b.disabled = true);
+  status('Generando con ' + $('model').value + '… puede tardar hasta un minuto.', 'busy');
+  try {
+    const parts = [];
+    if (withPdf) {
+      if (state.pdf) parts.push({ inline_data: { mime_type: 'application/pdf', data: state.pdf } });
+      else parts.push({ text: 'DOCUMENTO DEL TEMA:\n\n' + state.text });
     }
-  </script>
+    parts.push({ text: prompt });
+    const sel = $('model');
+    const tried = [];
+    let text;
+    const candidates = [sel.value, ...[...sel.options].map(o => o.value).filter(v => v !== sel.value)].slice(0, 5);
+    for (const m of candidates) {
+      try {
+        if (tried.length) status(`Probando con ${m}…`, 'busy');
+        text = await gemini(m, parts, json);
+        sel.value = m;
+        break;
+      } catch (e) {
+        if (!e.noFree && e.code !== 404) throw e;
+        tried.push(m);
+      }
+    }
+    if (text === undefined) throw new Error('Ningún modelo de la lista tiene cuota gratuita con esta clave: ' + tried.join(', ') + '.\nActiva la facturación en Google AI Studio o crea la clave en un proyecto nuevo.');
+    onOk(text);
+    setStep(n, 'done');
+    status('Listo.', 'ok');
+  } catch (e) {
+    status(e.message, 'error');
+  } finally {
+    $('b1').disabled = !hasSource();
+    $('b2').disabled = !state.summary;
+    $('b3').disabled = !state.summary;
+  }
+}
+
+$('btnModels').onclick = async () => {
+  if (!getKey()) return status('Pega primero tu clave API.', 'error');
+  status('Consultando a Google…', 'busy');
+  try {
+    const res = await fetch(`${API}/models?pageSize=200`, { headers: { 'x-goog-api-key': getKey() } });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error.message);
+    const names = data.models
+      .filter(m => (m.supportedGenerationMethods || []).includes('generateContent'))
+      .map(m => m.name.replace('models/', ''))
+      .filter(n => /^gemini-/.test(n) && !/(tts|image|embedding|live|audio|robotics|computer-use)/.test(n))
+      .sort((a, b) => {
+        const pref = ['gemini-2.5-flash', 'gemini-2.5-flash-lite', 'gemini-2.0-flash', 'gemini-2.5-pro'];
+        const ia = pref.indexOf(a), ib = pref.indexOf(b);
+        if (ia !== -1 || ib !== -1) return (ia === -1 ? 99 : ia) - (ib === -1 ? 99 : ib);
+        return a.localeCompare(b);
+      });
+    const sel = $('model');
+    sel.innerHTML = names.map(n => `<option>${n}</option>`).join('');
+    persistKey();
+    status(`Clave válida. ${names.length} modelos disponibles.`, 'ok');
+  } catch (e) {
+    status('La clave no funciona: ' + e.message, 'error');
+  }
+};
+
+/* ---------- Tarea 1: resumen ---------- */
+$('b1').onclick = () => run(1,
+`Actúa como maestra de Educación Primaria. Elabora un RESUMEN DE ESTUDIO completo del tema del documento adjunto para ${$('grade').value}, en español y en Markdown.
+Estructura:
+1. Título del tema y subtítulo con el curso.
+2. Párrafo introductorio que motive al alumnado.
+3. Esquema inicial en texto con flechas (por ejemplo: **Célula** → **Tejido** → **Órgano**).
+4. Epígrafes numerados con viñetas (🔹, 💡, 📌) y los términos clave en negrita.
+5. Tablas o clasificaciones cuando el tema lo pida.
+6. Cierre con el título "✅ Lo que debes recordar" y los puntos esenciales.
+Usa un lenguaje claro y adecuado a la edad.`, true, text => {
+  state.summary = text;
+  $('o1').innerHTML = marked.parse(text);
+  ['dlWord', 'cp1'].forEach(i => $(i).disabled = false);
+  setStep(2, 'ready'); setStep(3, 'ready');
+  tab('p1');
+});
+
+/* ---------- Tarea 2: dashboard ---------- */
+$('b2').onclick = () => run(2,
+`A partir de este resumen para ${$('grade').value}, crea un dashboard interactivo en un único archivo HTML5 (CSS en <style>, sin librerías externas ni imágenes remotas), para subir a Google Classroom.
+Requisitos:
+- Paleta: azul #2B6CB0, verde #319795, fondo #F4F7FB.
+- Secciones desplegables con <details> y <summary>.
+- Diseño responsive y letra grande y legible.
+- Bloque final destacado en verde con "✅ Lo que debes recordar".
+Devuelve SOLO el código HTML, dentro de un bloque \`\`\`html.
+
+RESUMEN:
+${state.summary}`, false, text => {
+  const m = text.match(/```html\s*([\s\S]*?)```/i);
+  state.html = (m ? m[1] : text.replace(/```(html)?/gi, '')).trim();
+  $('frame').srcdoc = state.html;
+  ['dlHtml', 'cpHtml'].forEach(i => $(i).disabled = false);
+  tab('p2');
+});
+
+/* ---------- Tarea 3: cuestionario interactivo ---------- */
+function parseQuestions(text) {
+  const clean = text.replace(/```json|```/gi, '').trim();
+  const start = clean.indexOf('['), end = clean.lastIndexOf(']');
+  if (start < 0 || end < 0) throw new Error('El modelo no devolvió un cuestionario válido. Vuelve a intentarlo.');
+  const arr = JSON.parse(clean.slice(start, end + 1));
+  const qs = arr.map(x => {
+    let c = x.correct;
+    if (typeof c === 'string') c = 'ABCD'.indexOf(c.trim().toUpperCase().charAt(0));
+    return { q: String(x.q || x.pregunta || '').trim(), options: (x.options || x.opciones || []).map(String), correct: Number(c), explanation: String(x.explanation || x.explicacion || '').trim() };
+  }).filter(x => x.q && x.options.length === 4 && x.correct >= 0 && x.correct <= 3);
+  if (qs.length < 5) throw new Error('Se generaron muy pocas preguntas válidas. Vuelve a intentarlo.');
+  return qs;
+}
+
+function buildQuizHTML(title, questions) {
+  const data = JSON.stringify(questions).replace(/</g, '\\u003c');
+  const safeTitle = title.replace(/[<>&]/g, '');
+  return `<!DOCTYPE html>
+<html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cuestionario · ${safeTitle}</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f4f7fb;color:#1d2733;font:18px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:760px;margin:0 auto;padding:20px}
+h1{font-size:1.3rem;color:#1b4268;margin:0 0 4px}.sub{color:#5d6b7a;font-size:.9rem;margin-bottom:14px}
+.bar{height:10px;background:#d5dde5;border-radius:5px;overflow:hidden}.bar i{display:block;height:100%;width:0;background:#f2b705;transition:width .3s}
+#count{font-size:.9rem;color:#5d6b7a;margin:8px 0 14px}
+.card{background:#fff;border:1px solid #d5dde5;border-radius:10px;padding:22px}
+#qt{font-size:1.2rem;font-weight:700;margin:0 0 16px}
+.opt{display:flex;gap:12px;align-items:flex-start;width:100%;text-align:left;font:inherit;background:#fff;border:2px solid #d5dde5;border-radius:8px;padding:12px 14px;margin-bottom:10px;cursor:pointer;color:inherit}
+.opt b{flex:none;width:30px;height:30px;border-radius:50%;background:#e6edf4;display:grid;place-items:center;font-size:.95rem}
+.opt:hover:not(:disabled){border-color:#2b5d8c;background:#eef4fa}
+.opt:disabled{cursor:default}
+.opt.ok{border-color:#2f7d5b;background:#e3f3ea}.opt.ok b{background:#2f7d5b;color:#fff}
+.opt.bad{border-color:#b3382c;background:#fbeceb}.opt.bad b{background:#b3382c;color:#fff}
+:focus-visible{outline:3px solid #f2b705;outline-offset:2px}
+.fb{display:none;margin-top:6px;padding:12px 14px;border-radius:8px;font-size:.95rem}
+.fb.show{display:block}.fb.ok{background:#e3f3ea;color:#1f5a40}.fb.bad{background:#fbeceb;color:#8c2a20}
+.btn{font:inherit;font-weight:700;cursor:pointer;background:#2b5d8c;color:#fff;border:0;border-radius:8px;padding:11px 20px;margin-top:14px}
+.btn:hover{background:#1b4268}
+.score{font-size:3rem;font-weight:800;color:#1b4268;margin:0}
+.rev{border-left:5px solid #b3382c;background:#fff;padding:10px 14px;margin:10px 0;border-radius:0 8px 8px 0;font-size:.95rem}
+</style></head><body><div class="wrap">
+<h1>Cuestionario: ${safeTitle}</h1><div class="sub">Pulsa una respuesta. Verás al instante si has acertado.</div>
+<div class="bar"><i id="prog"></i></div><div id="count"></div>
+<div class="card" id="game"><p id="qt"></p><div id="opts"></div><div class="fb" id="fb" role="status" aria-live="polite"></div>
+<button class="btn" id="next" style="display:none"></button></div>
+<div class="card" id="end" style="display:none"></div>
+</div>
+<script>
+var Q=${data},i=0,score=0,wrong=[],locked=false;
+function $(id){return document.getElementById(id)}
+function L(k){return "ABCD".charAt(k)}
+function show(){
+  var q=Q[i];locked=false;
+  $("prog").style.width=(i/Q.length*100)+"%";
+  $("count").textContent="Pregunta "+(i+1)+" de "+Q.length+" · Aciertos: "+score;
+  $("qt").textContent=q.q;
+  var box=$("opts");box.innerHTML="";
+  q.options.forEach(function(o,k){
+    var b=document.createElement("button");b.className="opt";
+    var l=document.createElement("b");l.textContent=L(k);
+    var t=document.createElement("span");t.textContent=o;
+    b.appendChild(l);b.appendChild(t);b.onclick=function(){pick(k,b)};box.appendChild(b);
+  });
+  $("fb").className="fb";$("fb").innerHTML="";$("next").style.display="none";
+}
+function pick(k,btn){
+  if(locked)return;locked=true;
+  var q=Q[i],btns=[].slice.call($("opts").children),fb=$("fb");
+  btns.forEach(function(b){b.disabled=true});
+  var head=document.createElement("strong"),body=document.createElement("span");
+  fb.innerHTML="";
+  if(k===q.correct){
+    score++;btn.classList.add("ok");fb.className="fb show ok";
+    head.textContent="✅ ¡Correcto! ";body.textContent=q.explanation;
+  }else{
+    wrong.push(i);btn.classList.add("bad");btns[q.correct].classList.add("ok");fb.className="fb show bad";
+    head.textContent="❌ Incorrecto. ";
+    body.textContent="La solución es "+L(q.correct)+") "+q.options[q.correct]+". "+q.explanation;
+  }
+  fb.appendChild(head);fb.appendChild(body);
+  var n=$("next");n.textContent=i<Q.length-1?"Siguiente pregunta":"Ver resultado";n.style.display="inline-block";n.focus();
+}
+$("next").onclick=function(){if(i<Q.length-1){i++;show()}else finish()};
+function finish(){
+  $("game").style.display="none";$("end").style.display="block";$("prog").style.width="100%";
+  var pct=Math.round(score/Q.length*100);
+  $("count").textContent="Cuestionario terminado";
+  var e=$("end");e.innerHTML="";
+  var s=document.createElement("p");s.className="score";s.textContent=score+" / "+Q.length;e.appendChild(s);
+  var m=document.createElement("p");
+  m.textContent=pct>=90?"¡Excelente trabajo! 🌟":pct>=70?"¡Muy bien! Sigue así 👏":pct>=50?"Vas por buen camino. Repasa los fallos 📚":"Repasa el tema y vuelve a intentarlo 💪";
+  e.appendChild(m);
+  if(wrong.length){
+    var h=document.createElement("h2");h.textContent="Preguntas para repasar";h.style.fontSize="1.1rem";e.appendChild(h);
+    wrong.forEach(function(w){
+      var q=Q[w],d=document.createElement("div");d.className="rev";
+      var a=document.createElement("strong");a.textContent=q.q;
+      var b=document.createElement("div");b.textContent="Solución: "+L(q.correct)+") "+q.options[q.correct];
+      d.appendChild(a);d.appendChild(b);e.appendChild(d);
+    });
+  }
+  var r=document.createElement("button");r.className="btn";r.textContent="Repetir cuestionario";
+  r.onclick=function(){i=0;score=0;wrong=[];$("end").style.display="none";$("game").style.display="block";show()};
+  e.appendChild(r);
+}
+show();
+<\/script></body></html>`;
+}
+
+$('b3').onclick = () => run(3,
+`A partir de este resumen para ${$('grade').value}, crea un cuestionario de AL MENOS 30 preguntas de opción múltiple, en español.
+Devuelve SOLO un array JSON (sin texto antes ni después) con objetos de esta forma exacta:
+{"q": "texto de la pregunta", "options": ["opción A", "opción B", "opción C", "opción D"], "correct": 0, "explanation": "explicación breve de por qué es correcta"}
+Reglas: "correct" es el índice (0 a 3) de la opción correcta; cada pregunta tiene exactamente 4 opciones distintas y solo una correcta; varía la posición de la correcta; varía el tipo (conceptos, definiciones, verdadero/falso con 4 opciones, razonamiento); cubre todos los puntos clave; lenguaje adecuado a la edad; nada de comillas dobles sin escapar dentro de los textos.
+
+RESUMEN:
+${state.summary}`, false, text => {
+  state.questions = parseQuestions(text);
+  const h = state.summary.match(/^#{1,2}\s+(.+)$/m);
+  const title = (h ? h[1].replace(/[*_#]/g, '').trim() : 'Tema') + ' · ' + $('grade').value;
+  state.quizHtml = buildQuizHTML(title, state.questions);
+  $('frame3').srcdoc = state.quizHtml;
+  ['dlQuiz', 'cpQuiz', 'dlCsv'].forEach(i => $(i).disabled = false);
+  tab('p3');
+}, true);
+
+/* ---------- Descargas y copiado ---------- */
+$('dlWord').onclick = () => download('resumen_estudio.doc',
+  '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word"><head><meta charset="utf-8"><style>body{font-family:Calibri,Arial,sans-serif}table{border-collapse:collapse}td,th{border:1px solid #999;padding:4px}</style></head><body>'
+  + $('o1').innerHTML + '</body></html>', 'application/msword');
+$('cp1').onclick = () => copy($('o1').innerText);
+$('dlHtml').onclick = () => download('dashboard_classroom.html', state.html, 'text/html');
+$('cpHtml').onclick = () => copy(state.html);
+$('dlQuiz').onclick = () => download('cuestionario_interactivo.html', state.quizHtml, 'text/html');
+$('cpQuiz').onclick = () => copy(state.quizHtml);
+$('dlCsv').onclick = () => {
+  const q = c => '"' + String(c).replace(/"/g, '""') + '"';
+  const head = ['N.º', 'Pregunta', 'Opción A', 'Opción B', 'Opción C', 'Opción D', 'Respuesta correcta', 'Explicación'].map(q).join(';');
+  const rows = state.questions.map((x, i) => [i + 1, x.q, ...x.options, 'ABCD'[x.correct], x.explanation].map(q).join(';'));
+  download('cuestionario_kahoot.csv', [head, ...rows].join('\r\n'), 'text/csv');
+};
+</script>
 </body>
 </html>
