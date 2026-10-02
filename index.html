@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Asistente Docente - Generador de Materiales de Primaria</title>
+  <!-- Marked.js para renderizar Markdown -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <style>
+    :root {
+      --primary: #2B6CB0;
+      --primary-dark: #1A365D;
+      --secondary: #319795;
+      --accent: #38A169;
+      --bg: #F4F7FB;
+      --card-bg: #FFFFFF;
+      --text: #2D3748;
+      --border: #CBD5E0;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 20px;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    header {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      padding: 25px;
+      border-radius: 12px;
+      text-align: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      margin-bottom: 25px;
+    }
+
+    header h1 { margin: 0 0 8px 0; font-size: 26px; }
+    header p { margin: 0; opacity: 0.95; font-size: 15px; }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 25px;
+      margin-bottom: 25px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    label { font-weight: 600; color: var(--primary-dark); font-size: 14px; }
+
+    input, select, button {
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 15px;
+      outline: none;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(43, 108, 176, 0.2);
+    }
+
+    .file-dropzone {
+      border: 2px dashed #A0AEC0;
+      border-radius: 8px;
+      padding: 20px;
+      text-align: center;
+      background: #EDF2F7;
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s;
+    }
+
+    .file-dropzone:hover { 
+      background: #E2E8F0; 
+      border-color: var(--primary);
+    }
+
+    .file-dropzone.active {
+      background: #EBF8FF;
+      border-color: var(--primary);
+      color: var(--primary-dark);
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 20px;
+    }
+
+    .btn {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn:hover { background-color: var(--primary-dark); transform: translateY(-1px); }
+    .btn:disabled { background-color: #A0AEC0; cursor: not-allowed; transform: none; opacity: 0.7; }
+    .btn-secondary { background-color: var(--secondary); }
+    .btn-secondary:hover { background-color: #2C7A7B; }
+    .btn-accent { background-color: var(--accent); }
+    .btn-accent:hover { background-color: #2F855A; }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      border-bottom: 2px solid #E2E8F0;
+      margin-bottom: 20px;
+      overflow-x: auto;
+    }
+
+    .tab-btn {
+      padding: 10px 18px;
+      background: none;
+      border: none;
+      border-bottom: 3px solid transparent;
+      font-weight: 600;
+      color: #718096;
+      cursor: pointer;
+      border-radius: 0;
+      white-space: nowrap;
+    }
+
+    .tab-btn.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    .output-box {
+      background: #FAFAFA;
+      border: 1px solid #E2E8F0;
+      border-radius: 8px;
+      padding: 20px;
+      min-height: 200px;
+      max-height: 600px;
+      overflow-y: auto;
+    }
+
+    .output-box table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+
+    .output-box th, .output-box td {
+      border: 1px solid #CBD5E0;
+      padding: 8px 12px;
+      text-align: left;
+      font-size: 14px;
+    }
+
+    .output-box th {
+      background-color: #EDF2F7;
+      color: var(--primary-dark);
+    }
+
+    .action-bar {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .btn-sm { padding: 6px 12px; font-size: 13px; }
+
+    iframe.preview-frame {
+      width: 100%;
+      height: 500px;
+      border: 1px solid #CBD5E0;
+      border-radius: 8px;
+      background: white;
+    }
+
+    .loading-spinner {
+      display: none;
+      text-align: center;
+      padding: 20px;
+      font-weight: 600;
+      color: var(--primary);
+      background: #EBF8FF;
+      border-radius: 8px;
+      margin-top: 15px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <h1>📚 Asistente Docente de Primaria</h1>
+      <p>Generador progresivo de materiales didácticos para 4.º, 5.º y 6.º de Primaria</p>
+    </header>
+
+    <!-- Configuración inicial -->
+    <div class="card">
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="apiKey">🔑 Clave API de Gemini (Gratuita):</label>
+          <input type="password" id="apiKey" placeholder="Pega tu API Key de Google AI Studio...">
+          <small><a href="https://aistudio.google.com/app/apikey" target="_blank" style="color: var(--primary);">Obtener API Key gratuita en Google AI Studio</a></small>
+        </div>
+
+        <div class="form-group">
+          <label for="grade">🎓 Curso Escolar:</label>
+          <select id="grade">
+            <option value="4.º de Primaria">4.º de Primaria</option>
+            <option value="5.º de Primaria">5.º de Primaria</option>
+            <option value="6.º de Primaria" selected>6.º de Primaria</option>
+          </select>
+        </div>
+
+        <div class="form-group" style="grid-column: 1 / -1;">
+          <label>📄 Adjuntar Tema en PDF:</label>
+          <div class="file-dropzone" id="dropzone" onclick="document.getElementById('pdfFile').click()">
+            <span id="fileName">Haz clic para seleccionar el archivo PDF de la unidad didáctica</span>
+            <input type="file" id="pdfFile" accept="application/pdf" style="display:none" onchange="handleFileSelect(event)">
+          </div>
+        </div>
+      </div>
+
+      <div class="btn-group">
+        <button class="btn" id="btnTask1" onclick="generateTask(1)">📖 1. Generar Resumen (Word)</button>
+        <button class="btn btn-secondary" id="btnTask2" onclick="generateTask(2)" disabled>🌐 2. Generar Dashboard HTML</button>
+        <button class="btn btn-accent" id="btnTask3" onclick="generateTask(3)" disabled>🎮 3. Generar Kahoot (30+ preg.)</button>
+      </div>
+
+      <div class="loading-spinner" id="loadingSpinner">
+        ⏳ Procesando la unidad didáctica con Gemini IA... Por favor, espera unos segundos.
+      </div>
+    </div>
+
+    <!-- Resultados en Pestañas -->
+    <div class="card">
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('tab1', event)">📖 1. Resumen de Estudio</button>
+        <button class="tab-btn" onclick="switchTab('tab2', event)">🌐 2. Dashboard HTML</button>
+        <button class="tab-btn" onclick="switchTab('tab3', event)">🎮 3. Juego Kahoot</button>
+      </div>
+
+      <!-- Pestaña 1: Resumen -->
+      <div id="tab1" class="tab-content active">
+        <div class="action-bar">
+          <button class="btn btn-sm" onclick="copyToClipboard('outputTask1')">📋 Copiar Texto</button>
+        </div>
+        <div id="outputTask1" class="output-box">
+          <p style="color: #718096; text-align: center;">Adjunta un archivo PDF y pulsa "1. Generar Resumen" para comenzar.</p>
+        </div>
+      </div>
+
+      <!-- Pestaña 2: Dashboard -->
+      <div id="tab2" class="tab-content">
+        <div class="action-bar">
+          <button class="btn btn-sm" onclick="copyToClipboard('outputTask2Code', true)">📋 Copiar Código HTML</button>
+          <button class="btn btn-sm btn-secondary" onclick="downloadHTML()">💾 Descargar .html</button>
+        </div>
+        <iframe id="previewDashboard" class="preview-frame"></iframe>
+        <textarea id="outputTask2Code" style="display:none;"></textarea>
+      </div>
+
+      <!-- Pestaña 3: Kahoot -->
+      <div id="tab3" class="tab-content">
+        <div class="action-bar">
+          <button class="btn btn-sm" onclick="copyToClipboard('outputTask3')">📋 Copiar Cuestionario</button>
+        </div>
+        <div id="outputTask3" class="output-box">
+          <p style="color: #718096; text-align: center;">Genera primero el resumen para poder crear las preguntas de Kahoot.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let base64PDF = null;
+    let generatedSummary = "";
+
+    function handleFileSelect(event) {
+      const file = event.target.files[0];
+      if (file && file.type === "application/pdf") {
+        document.getElementById('fileName').innerText = `📄 Archivo cargado: ${file.name} (${(file.size / (1024 * 1024)).toFixed(2)} MB)`;
+        document.getElementById('dropzone').classList.add('active');
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          base64PDF = e.target.result.split(',')[1];
+        };
+        reader.readAsDataURL(file);
+      } else {
+        alert("Por favor, selecciona un archivo PDF válido.");
+      }
+    }
+
+    function switchTab(tabId, evt) {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+      
+      if (evt && evt.target) {
+        evt.target.classList.add('active');
+      }
+      document.getElementById(tabId).classList.add('active');
+    }
+
+    async function callGemini(promptText, usePDF = true) {
+      const apiKey = document.getElementById('apiKey').value.trim();
+      if (!apiKey) {
+        alert("Por favor, introduce tu API Key gratuita de Gemini.");
+        return null;
+      }
+
+      if (usePDF && !base64PDF) {
+        alert("Por favor, adjunta primero el PDF del tema.");
+        return null;
+      }
+
+      const spinner = document.getElementById('loadingSpinner');
+      spinner.style.display = 'block';
+
+      // Endpoint oficial Gemini 1.5 Flash
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+
+      const contents = [{ parts: [] }];
+      
+      if (usePDF && base64PDF) {
+        contents[0].parts.push({
+          inline_data: {
+            mime_type: "application/pdf",
+            data: base64PDF
+          }
+        });
+      }
+
+      contents[0].parts.push({ text: promptText });
+
+      try {
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ contents })
+        });
+
+        const data = await response.json();
+        spinner.style.display = 'none';
+
+        // Manejo específico de errores devueltos por la API de Google
+        if (data.error) {
+          console.error("Detalle del error:", data.error);
+          alert(`Error de Google AI (${data.error.code || 'API'}): ${data.error.message}`);
+          return null;
+        }
+
+        if (data.candidates && data.candidates[0]?.content?.parts[0]?.text) {
+          return data.candidates[0].content.parts[0].text;
+        } else {
+          alert("La API respondió pero no generó texto. Verifica que el PDF sea legible y no esté protegido.");
+          return null;
+        }
+      } catch (err) {
+        spinner.style.display = 'none';
+        alert("Error de conexión con la red: " + err.message);
+        return null;
+      }
+    }
+
+    async function generateTask(taskNum) {
+      const grade = document.getElementById('grade').value;
+
+      if (taskNum === 1) {
+        const prompt = `Actúa como una maestra de Educación Primaria. Elabora un RESUMEN DE ESTUDIO completo y perfectamente maquetado del tema adjunto para el curso ${grade}.
+Sigue estas pautas estrictas:
+1. Encabezado con título del tema y subtítulo para ${grade}.
+2. Párrafo introductorio motivador.
+3. Esquema visual inicial en texto con cajas/flechas ([CÉLULA] -> [TEJIDO] -> ...).
+4. Epígrafes numerados usando viñetas visuales (🔹, 💡, 📌) y términos clave en negrita.
+5. Tablas explicativas o clasificaciones si el tema lo requiere.
+6. Cierre obligatorio bajo el título "✅ Lo que debes recordar" con los puntos clave esenciales.`;
+
+        const result = await callGemini(prompt, true);
+        if (result) {
+          generatedSummary = result;
+          document.getElementById('outputTask1').innerHTML = marked.parse(result);
+          document.getElementById('btnTask2').disabled = false;
+        }
+      } 
+      else if (taskNum === 2) {
+        const prompt = `A partir del siguiente resumen de estudio para ${grade}, genera el código completo HTML y CSS de un Dashboard Interactivo para Google Classroom:
+
+RESUMEN BASE:
+${generatedSummary}
+
+REQUISITOS DEL DASHBOARD HTML:
+1. Código HTML5 completo en un solo bloque (incluye estilos en etiqueta <style>).
+2. Paleta de colores educativa (Azul #2B6CB0, Verde #319795, Fondo #F4F7FB).
+3. Utiliza elementos desplegables (<details> y <summary>) para que los niños puedan hacer clic y revelar la información.
+4. Incluye un bloque final destacado en verde con "✅ Lo que debes recordar".
+5. Devuelve ÚNICAMENTE el código HTML empaquetado en un bloque de código \`\`\`html.`;
+
+        const result = await callGemini(prompt, false);
+        if (result) {
+          const cleanHTML = result.replace(/```html/g, '').replace(/```/g, '').trim();
+          document.getElementById('outputTask2Code').value = cleanHTML;
+          
+          const iframe = document.getElementById('previewDashboard');
+          iframe.contentWindow.document.open();
+          iframe.contentWindow.document.write(cleanHTML);
+          iframe.contentWindow.document.close();
+
+          document.getElementById('btnTask3').disabled = false;
+          
+          // Cambiar a la pestaña de Dashboard
+          const tabBtn = document.querySelectorAll('.tab-btn')[1];
+          switchTab('tab2', { target: tabBtn });
+        }
+      } 
+      else if (taskNum === 3) {
+        const prompt = `A partir del contenido del resumen de estudio para ${grade}, genera un cuestionario interactivo tipo Kahoot de AL MENOS 30 PREGUNTAS.
+
+Crea una tabla en formato Markdown con las siguientes columnas:
+1. N.º
+2. Pregunta (clara, directa y adaptada a ${grade})
+3. Opción A
+4. Opción B
+5. Opción C
+6. Opción D
+7. Respuesta Correcta (A, B, C o D)
+8. Tiempo (20s / 30s)
+9. Explicación corta (retroalimentación pedagógica)
+
+Asegúrate de cubrir todos los puntos clave del tema de forma variada (conceptos, definiciones, verdadero/falso y razonamiento).`;
+
+        const result = await callGemini(prompt, false);
+        if (result) {
+          document.getElementById('outputTask3').innerHTML = marked.parse(result);
+          
+          // Cambiar a la pestaña de Kahoot
+          const tabBtn = document.querySelectorAll('.tab-btn')[2];
+          switchTab('tab3', { target: tabBtn });
+        }
+      }
+    }
+
+    function copyToClipboard(elementId, isValue = false) {
+      const el = document.getElementById(elementId);
+      const text = isValue ? el.value : el.innerText;
+      if (!text) return;
+
+      navigator.clipboard.writeText(text).then(() => {
+        alert("¡Copiado al portapapeles!");
+      }).catch(err => {
+        alert("Error al copiar: " + err.message);
+      });
+    }
+
+    function downloadHTML() {
+      const htmlContent = document.getElementById('outputTask2Code').value;
+      if (!htmlContent) return;
+      
+      const blob = new Blob([htmlContent], { type: 'text/html' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'dashboard_classroom.html';
+      a.click();
+    }
+  </script>
+</body>
+</html>
