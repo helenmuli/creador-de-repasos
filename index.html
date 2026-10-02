@@ -201,23 +201,18 @@
       <p>Generador progresivo de materiales didácticos para 4.º, 5.º y 6.º de Primaria</p>
     </header>
 
-    <!-- Configuración inicial -->
     <div class="card">
       <div class="form-grid">
         <div class="form-group">
           <label for="apiKey">🔑 Clave API de Gemini:</label>
-          <input type="password" id="apiKey" placeholder="Pega tu API Key de Google AI Studio...">
+          <input type="password" id="apiKey" placeholder="Pega tu API Key..." onchange="loadAvailableModels()">
           <small><a href="https://aistudio.google.com/app/apikey" target="_blank" style="color: var(--primary);">Obtener API Key gratuita</a></small>
         </div>
 
         <div class="form-group">
-          <label for="modelSelect">🤖 Modelo de IA:</label>
+          <label for="modelSelect">🤖 Modelo de IA Activo:</label>
           <select id="modelSelect">
-            <option value="gemini-2.5-flash" selected>gemini-2.5-flash (Recomendado)</option>
-            <option value="gemini-2.0-flash">gemini-2.0-flash</option>
-            <option value="gemini-1.5-flash-latest">gemini-1.5-flash-latest</option>
-            <option value="gemini-1.5-flash">gemini-1.5-flash</option>
-            <option value="gemini-1.5-pro">gemini-1.5-pro</option>
+            <option value="">Ingresa tu API Key para cargar modelos...</option>
           </select>
         </div>
 
@@ -250,7 +245,6 @@
       </div>
     </div>
 
-    <!-- Resultados en Pestañas -->
     <div class="card">
       <div class="tabs">
         <button class="tab-btn active" id="tabBtn1" onclick="switchTab('tab1', 'tabBtn1')">📖 1. Resumen de Estudio</button>
@@ -258,7 +252,6 @@
         <button class="tab-btn" id="tabBtn3" onclick="switchTab('tab3', 'tabBtn3')">🎮 3. Juego Kahoot</button>
       </div>
 
-      <!-- Pestaña 1: Resumen -->
       <div id="tab1" class="tab-content active">
         <div class="action-bar">
           <button class="btn btn-sm" onclick="copyToClipboard('outputTask1')">📋 Copiar Texto</button>
@@ -268,7 +261,6 @@
         </div>
       </div>
 
-      <!-- Pestaña 2: Dashboard -->
       <div id="tab2" class="tab-content">
         <div class="action-bar">
           <button class="btn btn-sm" onclick="copyToClipboard('outputTask2Code', true)">📋 Copiar Código HTML</button>
@@ -278,7 +270,6 @@
         <textarea id="outputTask2Code" style="display:none;"></textarea>
       </div>
 
-      <!-- Pestaña 3: Kahoot -->
       <div id="tab3" class="tab-content">
         <div class="action-bar">
           <button class="btn btn-sm" onclick="copyToClipboard('outputTask3')">📋 Copiar Cuestionario</button>
@@ -319,9 +310,42 @@
       document.getElementById(tabId).classList.add('active');
     }
 
+    // Consulta la lista de modelos activos para la API Key
+    async function loadAvailableModels() {
+      const apiKey = document.getElementById('apiKey').value.trim();
+      const select = document.getElementById('modelSelect');
+      if (!apiKey) return;
+
+      select.innerHTML = '<option value="">🔎 Detectando modelos compatibles...</option>';
+
+      try {
+        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
+        const data = await res.json();
+
+        if (data.models && data.models.length > 0) {
+          const validModels = data.models.filter(m => 
+            m.supportedGenerationMethods && m.supportedGenerationMethods.includes('generateContent')
+          );
+
+          select.innerHTML = '';
+          validModels.forEach(m => {
+            const opt = document.createElement('option');
+            opt.value = m.name; // Ej: "models/gemini-2.5-flash"
+            opt.textContent = `${m.displayName \vert{}\vert{} m.name} (${m.name.replace('models/', '')})`;
+            select.appendChild(opt);
+          });
+        } else {
+          select.innerHTML = '<option value="models/gemini-1.5-flash">gemini-1.5-flash</option>';
+        }
+      } catch (err) {
+        console.error("Error al obtener modelos:", err);
+        select.innerHTML = '<option value="models/gemini-1.5-flash">gemini-1.5-flash</option>';
+      }
+    }
+
     async function callGemini(promptText, usePDF = true) {
       const apiKey = document.getElementById('apiKey').value.trim();
-      const selectedModel = document.getElementById('modelSelect').value;
+      let selectedModel = document.getElementById('modelSelect').value;
 
       if (!apiKey) {
         alert("Por favor, introduce tu API Key de Gemini.");
@@ -333,93 +357,52 @@
         return null;
       }
 
+      // Si aún no se han cargado modelos, se consulta la lista
+      if (!selectedModel || selectedModel === "") {
+        await loadAvailableModels();
+        selectedModel = document.getElementById('modelSelect').value || "models/gemini-1.5-flash";
+      }
+
+      const cleanModel = selectedModel.startsWith('models/') ? selectedModel : `models/${selectedModel}`;
+      const url = `https://generativelanguage.googleapis.com/v1beta/${cleanModel}:generateContent?key=${apiKey}`;
+
       const spinner = document.getElementById('loadingSpinner');
       spinner.style.display = 'block';
 
-      // 1. Probar con modelos candidatos en orden de prioridad
-      const candidateModels = [
-        selectedModel,
-        "gemini-2.5-flash",
-        "gemini-2.0-flash",
-        "gemini-1.5-flash-latest",
-        "gemini-1.5-flash",
-        "gemini-1.5-pro"
-      ];
-      const uniqueCandidates = [...new Set(candidateModels)];
-
-      for (let modelName of uniqueCandidates) {
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
-        const contents = [{ parts: [] }];
-        
-        if (usePDF && base64PDF) {
-          contents[0].parts.push({
-            inline_data: { mime_type: "application/pdf", data: base64PDF }
-          });
-        }
-        contents[0].parts.push({ text: promptText });
-
-        try {
-          const response = await fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ contents })
-          });
-          const data = await response.json();
-
-          if (!data.error && data.candidates && data.candidates[0]?.content?.parts[0]?.text) {
-            spinner.style.display = 'none';
-            return data.candidates[0].content.parts[0].text;
+      const parts = [];
+      if (usePDF && base64PDF) {
+        parts.push({
+          inlineData: {
+            mimeType: "application/pdf",
+            data: base64PDF
           }
-
-          if (data.error && (data.error.code === 400 || data.error.code === 403)) {
-            spinner.style.display = 'none';
-            alert(`Error en tu clave API de Google:\n${data.error.message}`);
-            return null;
-          }
-        } catch (err) {
-          console.warn(`Fallo con el modelo ${modelName}:`, err);
-        }
+        });
       }
+      parts.push({ text: promptText });
 
-      // 2. Si fallan los nombres estáticos, consultar dinámicamente qué modelos admite tu API Key
       try {
-        const listRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
-        const listData = await listRes.json();
-        
-        if (listData.models) {
-          const validModel = listData.models.find(m => 
-            m.supportedGenerationMethods && m.supportedGenerationMethods.includes('generateContent')
-          );
-          
-          if (validModel) {
-            const autoModelName = validModel.name.replace('models/', '');
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/${autoModelName}:generateContent?key=${apiKey}`;
-            const contents = [{ parts: [] }];
-            
-            if (usePDF && base64PDF) {
-              contents[0].parts.push({ inline_data: { mime_type: "application/pdf", data: base64PDF } });
-            }
-            contents[0].parts.push({ text: promptText });
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ contents: [{ parts: parts }] })
+        });
 
-            const response = await fetch(url, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ contents })
-            });
-            const data = await response.json();
-            
-            if (data.candidates && data.candidates[0]?.content?.parts[0]?.text) {
-              spinner.style.display = 'none';
-              return data.candidates[0].content.parts[0].text;
-            }
-          }
+        const data = await response.json();
+        spinner.style.display = 'none';
+
+        if (response.ok && data.candidates && data.candidates[0]?.content?.parts[0]?.text) {
+          return data.candidates[0].content.parts[0].text;
+        }
+
+        if (data.error) {
+          console.error("Error devuelto por Gemini:", data.error);
+          alert(`⚠️ Error de Google AI (${data.error.code}):\n${data.error.message}`);
         }
       } catch (err) {
-        console.error("Error al autodetectar modelos:", err);
+        spinner.style.display = 'none';
+        alert(`⚠️ Fallo de conexión:\n${err.message}`);
       }
 
-      spinner.style.display = 'none';
-      alert("No se pudo conectar con los modelos de Gemini. Comprueba que tu API Key esté correctamente generada en Google AI Studio.");
       return null;
     }
 
@@ -428,7 +411,7 @@
 
       if (taskNum === 1) {
         const prompt = `Actúa como una maestra de Educación Primaria. Elabora un RESUMEN DE ESTUDIO completo y perfectamente maquetado del tema adjunto para el curso ${grade}.
-Sigue estas pautas strictly:
+Sigue estas pautas estrictas:
 1. Encabezado con título del tema y subtítulo para ${grade}.
 2. Párrafo introductorio motivador.
 3. Esquema visual inicial en texto con cajas/flechas ([CÉLULA] -> [TEJIDO] -> ...).
